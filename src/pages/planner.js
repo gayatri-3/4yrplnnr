@@ -9,18 +9,45 @@ export default function Planner() {
             <Heading mb={4}>4yrplnnr</Heading>
             <Text>create your dream course plan</Text>
 
-            {/* list courses */}
-            {courses.map((course, index) => (
-                <Box
-                    mb={2}
-                    p={4}
-                    bg="white"
-                    borderWidth="1px"
-                    borderRadius="md"
-                >
-                    <Text>{course.id}</Text>
-                </Box>
-            ))}
+            {/* drag and drop courses */}
+            <DragDropContext>
+                <Flex>
+                    {/* left column: courses list */}
+                    <Droppable droppableId="courses">
+                        {(provided) => (
+                            <Box width="300px" bg="gray.100" p={4} mr={8}>
+                                <Text fontSize="xl" mb={4}>
+                                    Courses
+                                </Text>
+
+                                {/* courses list */}
+                                {courses.map((course, index) => (
+                                    <Draggable
+                                        key={course.id}
+                                        draggableId={course.id}
+                                        index={index}
+                                    >
+                                        {(provided) => (
+                                            <Box
+                                                mb={2}
+                                                p={4}
+                                                bg="white"
+                                                borderWidth="1px"
+                                                borderRadius="md"
+                                                ref={provided.innerRef}
+                                                {...provided.draggableProps}
+                                                {...provided.dragHandleProps}
+                                            >
+                                                <Text>{course.id}</Text>
+                                            </Box>
+                                        )}
+                                    </Draggable>
+                                ))}
+                            </Box>
+                        )}
+                    </Droppable>
+                </Flex>
+            </DragDropContext>
         </Flex>
     );
 }
