@@ -5,9 +5,24 @@ import { courses } from "../courses.js";
 
 export default function Planner() {
     return (
-        <Flex direction="column" align="center" justify="center" p={4}>
-            <Heading mb={4}>4yrplnnr</Heading>
-            <Text>create your dream course plan</Text>
+        <Flex
+            flexDir="column"
+            bg="main-bg"
+            minH="100vh"
+            w="full"
+            color="white-text"
+            pb="2rem"
+            align="center"
+        >
+            {/* page header: title and subtitle */}
+            <Flex py="4rem" flexDir="column" align="center">
+                <Heading fontSize="3xl" fontWeight={600}>
+                    4YRPLNNR
+                </Heading>
+                <Text fontSize="20px" fontWeight={600} color="gray-text">
+                    create your dream course plan
+                </Text>
+            </Flex>
 
             {/* drag and drop courses */}
             <DragDropContext>
