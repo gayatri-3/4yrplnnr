@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { courses as initialCourses } from "../courses.js";
 
-// Function to initialize grid items
-const createInitialGrid = () => [[], [], [], []]; // 4 grid cells
+// Function to initialize grid items (4x4 grid with empty arrays)
+const createInitialGrid = () => Array(16).fill([]); // Empty arrays for each cell
 
 export default function Planner() {
     // State to store courses and grid items
@@ -33,10 +33,10 @@ export default function Planner() {
 
             // Update grid items
             const updatedGridItems = [...gridItems];
-            if (!updatedGridItems[destIndex]) {
-                updatedGridItems[destIndex] = [];
-            }
-            updatedGridItems[destIndex].push(movedItem);
+            updatedGridItems[destIndex] = [
+                ...updatedGridItems[destIndex],
+                movedItem,
+            ];
 
             setCourses(updatedCourses);
             setGridItems(updatedGridItems);
@@ -55,7 +55,7 @@ export default function Planner() {
             align="center"
         >
             {/* Page header: title and subtitle */}
-            <Flex py="4rem" flexDir="column" align="center" mb="2rem">
+            <Flex py="4rem" flexDir="column" align="center">
                 <Heading fontSize="3xl" fontWeight={600}>
                     4YRPLNNR
                 </Heading>
@@ -66,15 +66,15 @@ export default function Planner() {
 
             {/* Drag and drop courses and planner grid */}
             <DragDropContext onDragEnd={onDragEnd}>
-                <Flex direction="row" align="start" w="full">
+                <Flex direction="row" align="start" w="full" h="full">
                     {/* Left column: Courses list */}
                     <Droppable droppableId="courses">
                         {(provided) => (
                             <Box
-                                width="25%" // 1/4 of the page width
+                                width="300px"
                                 bg="column-bg"
                                 p={4}
-                                mr={4} // Space between columns
+                                mr={8}
                                 ref={provided.innerRef}
                                 {...provided.droppableProps}
                             >
@@ -126,11 +126,11 @@ export default function Planner() {
                         )}
                     </Droppable>
 
-                    {/* Right side: 4 Grid Cells */}
+                    {/* Right side: 4x4 Grid Cells */}
                     <Droppable droppableId="grid" direction="horizontal">
                         {(provided) => (
                             <Box
-                                flex="3" // 3/4 of the page width
+                                flex="1"
                                 bg="column-bg"
                                 p={4}
                                 ref={provided.innerRef}
@@ -139,8 +139,8 @@ export default function Planner() {
                                 <Heading mb={4} color="gray-text">
                                     Academic Planner
                                 </Heading>
-                                <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-                                    {gridItems.map((item, index) => {
+                                <Grid templateColumns="repeat(4, 1fr)" gap={4}>
+                                    {gridItems.map((items, index) => {
                                         const droppableId = `cell-${index}`;
                                         return (
                                             <Droppable
@@ -158,29 +158,24 @@ export default function Planner() {
                                                         position="relative"
                                                         ref={provided.innerRef}
                                                         {...provided.droppableProps}
-                                                        w="100%" // Full width of GridItem
-                                                        h="auto" // Height adjusts based on content
                                                         border="1px solid transparent"
                                                         _hover={{
                                                             border: "1px solid gray",
                                                         }}
                                                     >
-                                                        {item.length > 0 ? (
-                                                            item.map(
-                                                                (
-                                                                    subItem,
-                                                                    subIndex
-                                                                ) => (
+                                                        {items.length > 0 ? (
+                                                            items.map(
+                                                                (item) => (
                                                                     <Draggable
                                                                         key={
-                                                                            subItem.id
+                                                                            item.id
                                                                         }
                                                                         draggableId={
-                                                                            subItem.id
+                                                                            item.id
                                                                         }
-                                                                        index={
-                                                                            subIndex
-                                                                        }
+                                                                        index={items.indexOf(
+                                                                            item
+                                                                        )}
                                                                     >
                                                                         {(
                                                                             provided
@@ -199,11 +194,11 @@ export default function Planner() {
                                                                                 borderRadius="md"
                                                                                 textAlign="center"
                                                                                 mb={
-                                                                                    2
-                                                                                } // Space between items
+                                                                                    1
+                                                                                }
                                                                             >
                                                                                 {
-                                                                                    subItem.id
+                                                                                    item.id
                                                                                 }
                                                                             </Box>
                                                                         )}
