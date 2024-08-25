@@ -4,7 +4,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { courses as initialCourses } from "../courses.js";
 
 // function to initialize grid items
-const createInitialGrid = () => [null, null]; // 2 grid cells
+const createInitialGrid = () => [[], []]; // 2 grid cells, each starting as an empty array
 
 export default function Planner() {
     // State to store courses and grid items
@@ -34,7 +34,11 @@ export default function Planner() {
             // Ensure the destination index is within bounds
             if (destIndex >= 0 && destIndex < gridItems.length) {
                 const updatedGridItems = [...gridItems];
-                updatedGridItems[destIndex] = movedItem;
+                // Add item to the destination cell array
+                updatedGridItems[destIndex] = [
+                    ...updatedGridItems[destIndex],
+                    movedItem,
+                ];
 
                 setCourses(updatedCourses);
                 setGridItems(updatedGridItems);
@@ -62,6 +66,7 @@ export default function Planner() {
                     Create your dream course plan
                 </Text>
             </Flex>
+
             {/* Drag and drop courses and planner grid */}
             <DragDropContext onDragEnd={onDragEnd}>
                 <Flex direction="row" align="start">
@@ -138,7 +143,7 @@ export default function Planner() {
                                     Academic Planner
                                 </Heading>
                                 <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-                                    {gridItems.map((item, index) => {
+                                    {gridItems.map((items, index) => {
                                         const droppableId = `cell-${index}`;
                                         return (
                                             <Droppable
@@ -163,35 +168,48 @@ export default function Planner() {
                                                             border: "1px solid gray",
                                                         }}
                                                     >
-                                                        {item ? (
-                                                            <Draggable
-                                                                key={item.id}
-                                                                draggableId={
-                                                                    item.id
-                                                                }
-                                                                index={0}
-                                                            >
-                                                                {(provided) => (
-                                                                    <Box
-                                                                        ref={
-                                                                            provided.innerRef
-                                                                        }
-                                                                        {...provided.draggableProps}
-                                                                        {...provided.dragHandleProps}
-                                                                        bg="card-bg"
-                                                                        p={2}
-                                                                        borderWidth="1px"
-                                                                        borderRadius="md"
-                                                                        textAlign="center"
-                                                                        w="100%"
-                                                                        h="100%"
-                                                                    >
-                                                                        {
+                                                        {items.length > 0 ? (
+                                                            items.map(
+                                                                (item, idx) => (
+                                                                    <Draggable
+                                                                        key={
                                                                             item.id
                                                                         }
-                                                                    </Box>
-                                                                )}
-                                                            </Draggable>
+                                                                        draggableId={
+                                                                            item.id
+                                                                        }
+                                                                        index={
+                                                                            idx
+                                                                        }
+                                                                    >
+                                                                        {(
+                                                                            provided
+                                                                        ) => (
+                                                                            <Box
+                                                                                ref={
+                                                                                    provided.innerRef
+                                                                                }
+                                                                                {...provided.draggableProps}
+                                                                                {...provided.dragHandleProps}
+                                                                                bg="card-bg"
+                                                                                p={
+                                                                                    2
+                                                                                }
+                                                                                borderWidth="1px"
+                                                                                borderRadius="md"
+                                                                                textAlign="center"
+                                                                                mb={
+                                                                                    2
+                                                                                }
+                                                                            >
+                                                                                {
+                                                                                    item.id
+                                                                                }
+                                                                            </Box>
+                                                                        )}
+                                                                    </Draggable>
+                                                                )
+                                                            )
                                                         ) : (
                                                             <Text color="gray-text">
                                                                 No Course
