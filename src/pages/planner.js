@@ -31,12 +31,14 @@ export default function Planner() {
                 10
             );
 
-            // Update grid items
-            const updatedGridItems = [...gridItems];
-            updatedGridItems[destIndex] = movedItem;
+            // Ensure the destination index is within bounds
+            if (destIndex >= 0 && destIndex < gridItems.length) {
+                const updatedGridItems = [...gridItems];
+                updatedGridItems[destIndex] = movedItem;
 
-            setCourses(updatedCourses);
-            setGridItems(updatedGridItems);
+                setCourses(updatedCourses);
+                setGridItems(updatedGridItems);
+            }
         }
     };
 
@@ -60,7 +62,6 @@ export default function Planner() {
                     Create your dream course plan
                 </Text>
             </Flex>
-
             {/* Drag and drop courses and planner grid */}
             <DragDropContext onDragEnd={onDragEnd}>
                 <Flex direction="row" align="start">
@@ -182,6 +183,8 @@ export default function Planner() {
                                                                         borderWidth="1px"
                                                                         borderRadius="md"
                                                                         textAlign="center"
+                                                                        w="100%"
+                                                                        h="100%"
                                                                     >
                                                                         {
                                                                             item.id
