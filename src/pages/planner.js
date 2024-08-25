@@ -4,7 +4,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { courses as initialCourses } from "../courses.js";
 
 // function to initialize grid items
-const createInitialGrid = () => [[], []]; // 2 grid cells, each starting as an empty array
+const createInitialGrid = () => [[], []]; // Each cell starts as an empty array
 
 export default function Planner() {
     // State to store courses and grid items
@@ -34,7 +34,6 @@ export default function Planner() {
             // Ensure the destination index is within bounds
             if (destIndex >= 0 && destIndex < gridItems.length) {
                 const updatedGridItems = [...gridItems];
-                // Add item to the destination cell array
                 updatedGridItems[destIndex] = [
                     ...updatedGridItems[destIndex],
                     movedItem,
@@ -69,15 +68,15 @@ export default function Planner() {
 
             {/* Drag and drop courses and planner grid */}
             <DragDropContext onDragEnd={onDragEnd}>
-                <Flex direction="row" align="start">
+                <Flex direction="row" align="start" w="full">
                     {/* Left column: Courses list */}
                     <Droppable droppableId="courses">
                         {(provided) => (
                             <Box
-                                width="300px"
+                                width="25%" // 1/4 of the page width
                                 bg="column-bg"
                                 p={4}
-                                mr={8}
+                                mr={4} // Space between columns
                                 ref={provided.innerRef}
                                 {...provided.droppableProps}
                             >
@@ -129,11 +128,11 @@ export default function Planner() {
                         )}
                     </Droppable>
 
-                    {/* Right side: 2 Grid Cells */}
+                    {/* Right side: Grid Cells */}
                     <Droppable droppableId="grid" direction="horizontal">
                         {(provided) => (
                             <Box
-                                flex="1"
+                                flex="3" // 3/4 of the page width
                                 bg="column-bg"
                                 p={4}
                                 ref={provided.innerRef}
@@ -161,8 +160,8 @@ export default function Planner() {
                                                         position="relative"
                                                         ref={provided.innerRef}
                                                         {...provided.droppableProps}
-                                                        w="350px" // Fixed width
-                                                        h="150px" // Fixed height
+                                                        w="100%" // Full width of GridItem
+                                                        h="auto" // Height adjusts based on content
                                                         border="1px solid transparent"
                                                         _hover={{
                                                             border: "1px solid gray",
@@ -170,7 +169,7 @@ export default function Planner() {
                                                     >
                                                         {items.length > 0 ? (
                                                             items.map(
-                                                                (item, idx) => (
+                                                                (item) => (
                                                                     <Draggable
                                                                         key={
                                                                             item.id
@@ -178,9 +177,9 @@ export default function Planner() {
                                                                         draggableId={
                                                                             item.id
                                                                         }
-                                                                        index={
-                                                                            idx
-                                                                        }
+                                                                        index={items.indexOf(
+                                                                            item
+                                                                        )}
                                                                     >
                                                                         {(
                                                                             provided
@@ -200,7 +199,7 @@ export default function Planner() {
                                                                                 textAlign="center"
                                                                                 mb={
                                                                                     2
-                                                                                }
+                                                                                } // Space between items
                                                                             >
                                                                                 {
                                                                                     item.id
@@ -212,7 +211,7 @@ export default function Planner() {
                                                             )
                                                         ) : (
                                                             <Text color="gray-text">
-                                                                No Course
+                                                                No Courses
                                                             </Text>
                                                         )}
                                                         {provided.placeholder}
