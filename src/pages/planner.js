@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { courses as initialCourses } from "../courses.js";
 
-// function to initialize grid items
-const createInitialGrid = () => [[], []]; // Each cell starts as an empty array
+// Function to initialize grid items
+const createInitialGrid = () => [[], [], [], []]; // 4 grid cells
 
 export default function Planner() {
     // State to store courses and grid items
@@ -31,17 +31,15 @@ export default function Planner() {
                 10
             );
 
-            // Ensure the destination index is within bounds
-            if (destIndex >= 0 && destIndex < gridItems.length) {
-                const updatedGridItems = [...gridItems];
-                updatedGridItems[destIndex] = [
-                    ...updatedGridItems[destIndex],
-                    movedItem,
-                ];
-
-                setCourses(updatedCourses);
-                setGridItems(updatedGridItems);
+            // Update grid items
+            const updatedGridItems = [...gridItems];
+            if (!updatedGridItems[destIndex]) {
+                updatedGridItems[destIndex] = [];
             }
+            updatedGridItems[destIndex].push(movedItem);
+
+            setCourses(updatedCourses);
+            setGridItems(updatedGridItems);
         }
     };
 
@@ -128,7 +126,7 @@ export default function Planner() {
                         )}
                     </Droppable>
 
-                    {/* Right side: Grid Cells */}
+                    {/* Right side: 4 Grid Cells */}
                     <Droppable droppableId="grid" direction="horizontal">
                         {(provided) => (
                             <Box
@@ -142,7 +140,7 @@ export default function Planner() {
                                     Academic Planner
                                 </Heading>
                                 <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-                                    {gridItems.map((items, index) => {
+                                    {gridItems.map((item, index) => {
                                         const droppableId = `cell-${index}`;
                                         return (
                                             <Droppable
@@ -167,19 +165,22 @@ export default function Planner() {
                                                             border: "1px solid gray",
                                                         }}
                                                     >
-                                                        {items.length > 0 ? (
-                                                            items.map(
-                                                                (item) => (
+                                                        {item.length > 0 ? (
+                                                            item.map(
+                                                                (
+                                                                    subItem,
+                                                                    subIndex
+                                                                ) => (
                                                                     <Draggable
                                                                         key={
-                                                                            item.id
+                                                                            subItem.id
                                                                         }
                                                                         draggableId={
-                                                                            item.id
+                                                                            subItem.id
                                                                         }
-                                                                        index={items.indexOf(
-                                                                            item
-                                                                        )}
+                                                                        index={
+                                                                            subIndex
+                                                                        }
                                                                     >
                                                                         {(
                                                                             provided
@@ -202,7 +203,7 @@ export default function Planner() {
                                                                                 } // Space between items
                                                                             >
                                                                                 {
-                                                                                    item.id
+                                                                                    subItem.id
                                                                                 }
                                                                             </Box>
                                                                         )}
