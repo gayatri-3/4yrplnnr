@@ -1,40 +1,43 @@
-import { Box, Flex, Heading, Text } from "@chakra-ui/react";
+import { Box, Flex, Heading, Text, Grid, GridItem } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { courses as initialCourses } from "../courses.js";
 
-export default function Planner() {
-    // courses initially displayed are imported from courses.js
-    const [courses, setCourses] = useState(initialCourses);
+// function to initialize grid items
+const createInitialGrid = () => [null, null]; // 2 grid cells
 
-    // called whenever drag and drop ends; handles repositioning of courses
+export default function Planner() {
+    // State to store courses and grid items
+    const [courses, setCourses] = useState(initialCourses);
+    const [gridItems, setGridItems] = useState(createInitialGrid());
+
+    // Handle drag and drop
     const onDragEnd = (result) => {
         const { destination, source } = result;
 
-        // if dropped outside valid zone, do nothing
+        // If dropped outside valid zone, do nothing
         if (!destination) {
             return;
         }
 
-        // if dropped in same place, do nothing
-        if (
-            destination.droppableId === source.droppableId &&
-            destination.index === source.index
-        ) {
-            return;
+        // Handle dragging courses from the course column to the grid
+        if (source.droppableId === "courses") {
+            const updatedCourses = Array.from(courses);
+            const [movedItem] = updatedCourses.splice(source.index, 1);
+
+            // Determine the cell index for the destination
+            const destIndex = parseInt(
+                destination.droppableId.split("-")[1],
+                10
+            );
+
+            // Update grid items
+            const updatedGridItems = [...gridItems];
+            updatedGridItems[destIndex] = movedItem;
+
+            setCourses(updatedCourses);
+            setGridItems(updatedGridItems);
         }
-
-        // reorder courses within the same droppable area
-
-        // copy courses array
-        const items = Array.from(courses);
-        // remove moved item from copy array
-        const [movedItem] = items.splice(source.index, 1);
-        // add moved item back to new spot in copy array
-        items.splice(destination.index, 0, movedItem);
-
-        // update state to copy array
-        setCourses(items);
     };
 
     return (
@@ -45,22 +48,23 @@ export default function Planner() {
             w="full"
             color="white-text"
             pb="2rem"
+            p={4}
             align="center"
         >
-            {/* page header: title and subtitle */}
-            <Flex py="4rem" flexDir="column" align="center">
+            {/* Page header: title and subtitle */}
+            <Flex py="4rem" flexDir="column" align="center" mb="2rem">
                 <Heading fontSize="3xl" fontWeight={600}>
                     4YRPLNNR
                 </Heading>
                 <Text fontSize="20px" fontWeight={600} color="gray-text">
-                    create your dream course plan
+                    Create your dream course plan
                 </Text>
             </Flex>
 
-            {/* drag and drop courses */}
+            {/* Drag and drop courses and planner grid */}
             <DragDropContext onDragEnd={onDragEnd}>
-                <Flex>
-                    {/* left column: courses list */}
+                <Flex direction="row" align="start">
+                    {/* Left column: Courses list */}
                     <Droppable droppableId="courses">
                         {(provided) => (
                             <Box
@@ -85,11 +89,10 @@ export default function Planner() {
                                         mb={4}
                                         color="gray-text"
                                     >
-                                        courses
+                                        Courses
                                     </Text>
                                 </Flex>
 
-                                {/* courses list with draggable boxes */}
                                 {courses.map((course, index) => (
                                     <Draggable
                                         key={course.id}
@@ -108,13 +111,97 @@ export default function Planner() {
                                                 {...provided.draggableProps}
                                                 {...provided.dragHandleProps}
                                             >
-                                                <Text textAlign={"center"}>
+                                                <Text textAlign="center">
                                                     {course.id}
                                                 </Text>
                                             </Box>
                                         )}
                                     </Draggable>
                                 ))}
+                                {provided.placeholder}
+                            </Box>
+                        )}
+                    </Droppable>
+
+                    {/* Right side: 2 Grid Cells */}
+                    <Droppable droppableId="grid" direction="horizontal">
+                        {(provided) => (
+                            <Box
+                                flex="1"
+                                bg="column-bg"
+                                p={4}
+                                ref={provided.innerRef}
+                                {...provided.droppableProps}
+                            >
+                                <Heading mb={4} color="gray-text">
+                                    Academic Planner
+                                </Heading>
+                                <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+                                    {gridItems.map((item, index) => {
+                                        const droppableId = `cell-${index}`;
+                                        return (
+                                            <Droppable
+                                                droppableId={droppableId}
+                                                key={droppableId}
+                                                direction="vertical"
+                                            >
+                                                {(provided) => (
+                                                    <GridItem
+                                                        bg="column-bg"
+                                                        p={4}
+                                                        borderWidth="1px"
+                                                        borderRadius="md"
+                                                        textAlign="center"
+                                                        position="relative"
+                                                        ref={provided.innerRef}
+                                                        {...provided.droppableProps}
+                                                        w="350px" // Fixed width
+                                                        h="150px" // Fixed height
+                                                        border="1px solid transparent"
+                                                        _hover={{
+                                                            border: "1px solid gray",
+                                                        }}
+                                                    >
+                                                        {item ? (
+                                                            <Draggable
+                                                                key={item.id}
+                                                                draggableId={
+                                                                    item.id
+                                                                }
+                                                                index={0}
+                                                            >
+                                                                {(provided) => (
+                                                                    <Box
+                                                                        ref={
+                                                                            provided.innerRef
+                                                                        }
+                                                                        {...provided.draggableProps}
+                                                                        {...provided.dragHandleProps}
+                                                                        bg="card-bg"
+                                                                        p={2}
+                                                                        borderWidth="1px"
+                                                                        borderRadius="md"
+                                                                        textAlign="center"
+                                                                    >
+                                                                        {
+                                                                            item.id
+                                                                        }
+                                                                    </Box>
+                                                                )}
+                                                            </Draggable>
+                                                        ) : (
+                                                            <Text color="gray-text">
+                                                                No Course
+                                                            </Text>
+                                                        )}
+                                                        {provided.placeholder}
+                                                    </GridItem>
+                                                )}
+                                            </Droppable>
+                                        );
+                                    })}
+                                </Grid>
+                                {provided.placeholder}
                             </Box>
                         )}
                     </Droppable>
